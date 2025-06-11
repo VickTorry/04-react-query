@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ReactPaginate from 'react-paginate';
 import { Toaster, toast } from 'react-hot-toast';
@@ -11,7 +11,7 @@ import MovieGrid from '../MovieGrid/MovieGrid';
 import MovieModal from '../MovieModal/MovieModal';
 import Loader from '../Loader/Loader';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
-import { useEffect } from 'react';
+
 import css from './App.module.css';
 
 export default function App() {
@@ -27,22 +27,24 @@ export default function App() {
     [string, string, number]
   >({
     queryKey: ['movies', query, page],
-  queryFn: () => fetchMovies(query, page),
-  enabled: query !== '',
-  networkMode: 'always',
-  onError(err: Error) {
-    if (err instanceof Error) {
-      toast.error(err.message);
-    }
-  },
+    queryFn: () => fetchMovies(query, page),
+    enabled: query !== '',
+    networkMode: 'always',
   });
-  
+
+  // Show "no results" toast
   useEffect(() => {
     if (isSuccess && data?.results.length === 0) {
       toast('No movies found for your request.');
     }
   }, [isSuccess, data]);
-  
+
+  // Show network or fetch error toast
+  useEffect(() => {
+    if (isError) {
+      toast.error('Something went wrong. Please try again.');
+    }
+  }, [isError]);
 
   const movies = data?.results ?? [];
   const totalPages = data?.total_pages ?? 0;
@@ -52,11 +54,10 @@ export default function App() {
       toast.error('You are offline. Please check your internet connection.');
       return;
     }
-  
+
     setQuery(searchQuery);
     setPage(1);
   };
-  
 
   const openModal = (movie: Movie) => {
     setSelectedMovie(movie);
@@ -71,7 +72,6 @@ export default function App() {
   return (
     <div className={css.app}>
       <Toaster position="top-right" />
-
       <div className={css.container}>
         <SearchBar onSubmit={handleSearchSubmit} />
 
@@ -91,7 +91,6 @@ export default function App() {
 
         {isLoading && <Loader />}
         {isError && <ErrorMessage />}
-
         {movies.length > 0 && <MovieGrid movies={movies} onSelect={openModal} />}
       </div>
 
