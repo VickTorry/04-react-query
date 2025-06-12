@@ -22,7 +22,7 @@ export default function App() {
   const [query, setQuery] = useState<string>('');
   const [page, setPage] = useState<number>(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  
 
   const queryKey: [string, string, number] = ['movies', query, page];
 
@@ -70,12 +70,10 @@ const { data, isError, isLoading, isSuccess } = useQuery<
 
   const openModal = (movie: Movie) => {
     setSelectedMovie(movie);
-    setIsModalOpen(true);
   };
-
+  
   const closeModal = () => {
     setSelectedMovie(null);
-    setIsModalOpen(false);
   };
 
   return (
@@ -103,9 +101,9 @@ const { data, isError, isLoading, isSuccess } = useQuery<
         {movies.length > 0 && <MovieGrid movies={movies} onSelect={openModal} />}
       </div>
 
-      {isModalOpen && selectedMovie && (
-        <MovieModal movie={selectedMovie} onClose={closeModal} />
-      )}
+      {selectedMovie && (
+  <MovieModal movie={selectedMovie} onClose={closeModal} />
+)}
     </div>
   );
 }
