@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 
 import ReactPaginate from 'react-paginate';
@@ -30,7 +30,7 @@ const queryOptions = {
   queryKey,
   queryFn: () => fetchMovies(query, page),
   enabled: query !== '',
-  keepPreviousData: true,
+  placeholderData: keepPreviousData,
 };
 
 const { data, isError, isLoading, isSuccess } = useQuery<
