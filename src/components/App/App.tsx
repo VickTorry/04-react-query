@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+
+
 import ReactPaginate from 'react-paginate';
 import { Toaster, toast } from 'react-hot-toast';
 
 import fetchMovies from '../../services/movieService';
-import type { Movie, FetchMoviesResponse } from '../../types/movie';
+import type { FetchMoviesResponse } from '../../services/movieService';
+
+import type { Movie} from '../../types/movie';
 
 import SearchBar from '../SearchBar/SearchBar';
 import MovieGrid from '../MovieGrid/MovieGrid';
@@ -20,17 +24,22 @@ export default function App() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { data, isError, isLoading, isSuccess } = useQuery<
-    FetchMoviesResponse,
-    Error,
-    FetchMoviesResponse,
-    [string, string, number]
-  >({
-    queryKey: ['movies', query, page],
-    queryFn: () => fetchMovies(query, page),
-    enabled: query !== '',
-    networkMode: 'always',
-  });
+  const queryKey: [string, string, number] = ['movies', query, page];
+
+const queryOptions = {
+  queryKey,
+  queryFn: () => fetchMovies(query, page),
+  enabled: query !== '',
+  keepPreviousData: true,
+};
+
+const { data, isError, isLoading, isSuccess } = useQuery<
+  FetchMoviesResponse,
+  Error,
+  FetchMoviesResponse,
+  [string, string, number]
+>(queryOptions);
+
 
   // Show "no results" toast
   useEffect(() => {
